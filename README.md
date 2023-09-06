@@ -64,7 +64,7 @@ To gain the ability to execute functions like **ExAllocatePoolWithTag**, attacke
 
 1. **Identify a Rarely Used Nt/Syscall Function:** The first step is to pinpoint a syscall function that the system rarely calls. A well-known example of such a function is NtAddAtom.
 3. **Overwrite the Function with Shellcode:** With the function identified, the attacker leverages a vulnerable driver's capability to write to physical memory. They then overwrite the function's existing code with shellcode. A common set of instructions used for this purpose is **mov RAX, AddressOfFunction; jmp RAX.**
-4. **Execute the Overwritten Function:** By doing this, the attacker can now execute NtAddAtom, but it behaves as if it were another function, like ExAllocatePoolWithTag or the Entry Point of a driver as stated below.
+4. **Execute the Overwritten Function:** By doing this, the attacker can now execute NtAddAtom, but it behaves as if it were another function, like ExAllocatePoolWithTag or the Entry Point of a driver as stated above.
 
 **The Flaw**
 
