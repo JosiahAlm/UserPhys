@@ -33,13 +33,14 @@ From what ive seen many individuals in the field seem to have a tunnel vision fo
 This project leverages an often-overlooked aspect of the Windows operating system. Specifically, it focuses on the behavior of **win32k.sys**, a Windows driver loaded into **ntoskrnl.exe** by **winload.efi**. This driver is responsible for receiving syscall execution for before delegating them to their respective drivers. The process can be visualized as:
 
 
-[image]
+![[image]](https://github.com/JosiahAlm/UserPhys/blob/main/img/Redirect.png)
 
 
 With the call stack represented as:
 
 
-[image]
+![[image]](https://github.com/JosiahAlm/UserPhys/blob/main/img/CallStack.png)
+
 
 By exploiting this mechanism, one can write to the specified qword, redirecting it to the address of a desired kernel function. This grants the ability to execute any kernel function without the need to modify the .text section of a driver or rely on a handler mapped into the kernel both being trival to detect as stated before, thus streamlining the process and reducing potential points of detection.
 
@@ -47,9 +48,9 @@ By exploiting this mechanism, one can write to the specified qword, redirecting 
 
 The driving factor behind this "Vulnerability" and what makes it so hard for anti-viruses to mitigate or track once loaded relys on many short comings of attempting to parse win32k.sys without manual intervention one of the main issues being locating these NT function handlers since the exports of **win32k.sys** do not directly point to them:
 
-[image1]
+![[image]](https://github.com/JosiahAlm/UserPhys/blob/main/img/StubExport.png)
 
-[image2]
+![[image]](https://github.com/JosiahAlm/UserPhys/blob/main/img/stubPsudo.png)
 
 
 If **win32k.sys** were structured such that its exports directly referenced each corresponding function, mitigation would be more straightforward. Anti-virus solutions could:
