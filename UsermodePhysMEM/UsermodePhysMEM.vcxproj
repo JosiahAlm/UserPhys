@@ -137,6 +137,7 @@
   <ItemGroup>
     <ClInclude Include="Driver.h" />
     <ClInclude Include="Kernel.h" />
+    <ClInclude Include="status.h" />
     <ClInclude Include="structs.h" />
     <ClInclude Include="Syscall.h" />
   </ItemGroup>

