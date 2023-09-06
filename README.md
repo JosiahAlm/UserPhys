@@ -8,7 +8,7 @@ This framework provides a modern approach to kernel exploitation, leveraging the
 4. **Wrappers for commonly used functions:** This project includes recreated versions for commonly used functions such as PsLookupProcessByProcessId or PsLookupThreadByThreadId by recreating there exact methods of retreiving there return data, utilizing physical memory read/write. Thus making monitoring of this programs execuation once gain even more challenging
 
 
-# Abstract:
+# Abstract
 This project leverages an often-overlooked aspect of the Windows operating system. Specifically, it focuses on the behavior of **win32k.sys**, a Windows driver loaded into **ntoskrnl.exe** by **winload.efi**. This driver is responsible for receiving syscall execution before delegating them to their respective drivers. The process can be visualized as:
 
 
