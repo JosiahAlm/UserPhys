@@ -1,0 +1,43 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Source Files\Driver">
+      <UniqueIdentifier>{df43b564-ec6c-4700-8259-464b09c76a2d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Exploit">
+      <UniqueIdentifier>{835805fd-b5f6-4ef6-9510-2682bfdbf646}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="UsermodePhysMEM.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Driver.cpp">
+      <Filter>Source Files\Driver</Filter>
+    </ClCompile>
+    <ClCompile Include="Kernel.cpp">
+      <Filter>Source Files\Exploit</Filter>
+    </ClCompile>
+    <ClCompile Include="Syscall.cpp">
+      <Filter>Source Files\Exploit</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Driver.h">
+      <Filter>Source Files\Driver</Filter>
+    </ClInclude>
+    <ClInclude Include="structs.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Kernel.h">
+      <Filter>Source Files\Exploit</Filter>
+    </ClInclude>
+    <ClInclude Include="Syscall.h">
+      <Filter>Source Files\Exploit</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
