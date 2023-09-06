@@ -7,7 +7,7 @@ This framework provides a modern approach to kernel exploitation, leveraging the
 3. **Direct Kernel Function Calls from User Mode:** This technique allows for direct calls to kernel functions from user mode without the need for a handler in kernel memory, diverging from the conventional ".data pointer" drivers methodology and making the task of detecting this execution marginally harder
 4. **Wrappers for commonly used functions:** This project includes recreated versions for commonly used functions such as PsLookupProcessByProcessId or PsLookupThreadByThreadId by recreating there exact methods of retreiving there return data, utilizing physical memory read/write. Thus making monitoring of this programs execuation once gain even more challenging
 
-# Abstract: Traditional UM->KM Communication and Function Execution
+# Abstract: Traditional UM->KM Communication and Function Execution and where its fundamentally flawed
 Historically, malware has sought kernel-level access through various methods, including the use of IOCTLs, hooking syscall functions, and abuse of pointer execution within syscall functions. Regardless of the specific technique, the initial steps of these approaches often follow a consistent procedure:
 
 1. **Utilization of a Vulnerable Driver:** The initial step involves identifying and exploiting a vulnerable driver with the capability to read/write physical memory.
