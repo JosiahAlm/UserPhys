@@ -2,7 +2,10 @@
 #include "Kernel.h"
 int main() {
 	Kernel Exploit;
-	Exploit.Initialize(false); // Start the driver and initialize the exploit
+	if (!Exploit.Initialize(true)) { // Start the driver and initialize the exploit
+		printf("[-] Exploit failed to initialize\n");
+		return -1;
+	} 
 	Exploit.Cleanup(); // By this point, the driver is fully stopped from running
 	// Everything below is read/written using the exploit and does not need UAC permissions or even have the driver installed after this point
 	// After running the exploit once, change Exploit.Initialize(true) to Exploit.Initialize(false) to prevent the driver from loading the bypass again 

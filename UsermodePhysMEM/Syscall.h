@@ -4,15 +4,11 @@
 #define NT_SUCCESS(Status) (((NTSTATUS)(Status)) >= 0)
 class Syscall {
 public:
-	Syscall() { }
-	Syscall(NtCall MmCopyMemory, NtCall MmMapIoSpaceEx, NtCall MmUnmapIoSpace) {
-		this->_MmCopyMemory = MmCopyMemory;
-		this->_MmMapIoSpaceEx = MmMapIoSpaceEx;
-		this->_MmUnmapIoSpace = MmUnmapIoSpace;
+	Syscall() = default;
+	Syscall(NtCall MmCopyMemory, NtCall MmMapIoSpaceEx, NtCall MmUnmapIoSpace) : _MmCopyMemory(MmCopyMemory), _MmMapIoSpaceEx(MmCopyMemory), _MmUnmapIoSpace(MmCopyMemory) {
 		LoadLibraryA("user32.dll");
 		LoadLibraryA("win32u.dll");
 		LoadLibraryA("ntdll.dll");
-
 	}
 	NTSTATUS MmCopyMemory(PVOID TargetAddress, MM_COPY_ADDRESS SourceAddress, SIZE_T NumberOfBYtes, ULONG Flags, PSIZE_T NumOfBytesTrans);
 	PVOID MmMapIoSpaceEx(PHYSICAL_ADDRESS TargetAddress, SIZE_T NumberOfBYtes, ULONG Protect);

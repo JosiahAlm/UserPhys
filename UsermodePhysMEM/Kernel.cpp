@@ -127,6 +127,7 @@ __int64 Kernel::ExportOffset(__int64 BaseAddress, const char* FunctionName)
 __int64 Kernel::KernelExport(const char* FunctionName)
 {
     HMODULE Address = LoadLibraryA("ntoskrnl.exe");
+    if (!Address) return 0;
     __int64 ExportedAddress = (__int64)(ntoskrnlVirtual + ExportOffset((__int64)Address, FunctionName));
     FreeLibrary(Address);
     return ExportedAddress;

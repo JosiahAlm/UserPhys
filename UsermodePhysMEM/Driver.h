@@ -2,14 +2,12 @@
 #include <windows.h>
 #include <iostream>
 #include "structs.h"
+
 class Driver
 {
 public:
-    Driver() { }
-    Driver(const char* DriverLocation, const char* ServiceName) {
-        this->DriverLocation = DriverLocation;
-        this->ServiceName = ServiceName;
-    }
+    Driver() = default;
+    Driver(const char* DriverLocation, const char* ServiceName) : _DriverLocation(DriverLocation), _ServiceName(ServiceName) { }
     NTSTATUS CreateDriver();
     NTSTATUS DeleteDriver();
 
@@ -19,8 +17,8 @@ public:
     bool ReadPhysical(__int64 PhysicalAddr, void* Buffer, int size);
     bool WritePhysical(__int64 PhysicalAddr, void* Buffer, int size);
 private:
-    const char* DriverLocation;
-    const char* ServiceName;
-    HANDLE DriverHandle;
+    const char* _DriverLocation;
+    const char* _ServiceName;
+    HANDLE _DriverHandle;
 };
 
