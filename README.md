@@ -21,7 +21,7 @@ With the call stack represented as:
 ![[image]](https://github.com/JosiahAlm/UserPhys/blob/main/img/CallStack.png)
 
 
-By exploiting this mechanism, one can write to the specified qword, redirecting it to the address of a desired kernel function. This grants the ability to execute any kernel function without the need to modify the .text section of a driver or rely on a handler mapped into the kernel both being trival to detect as stated before, thus streamlining the process and reducing potential points of detection.
+By exploiting this mechanism, one can write to the specified qword, redirecting it to the address of a desired kernel function. This grants the ability to execute any kernel function without the need to modify the .text section of a driver or rely on a handler mapped into the kernel both being trival to detect as stated below, thus streamlining the process and reducing potential points of detection.
 
 **Why This is So Challenging to Mitigate**
 
@@ -42,7 +42,7 @@ While this approach might be computationally intensive, potentially affecting sy
 
 However, the current setup doesn't afford this luxury as far as i know. Without direct references, a more labor-intensive approach becomes necessary:
 1. **Manual Definition:** One would need to manually define which qword corresponds to each function.
-2. **Follow the above steps:** After this legnth task has been done you could then follow the above steps but once again you run into the problem of computationally intensity.
+2. **Follow the above steps:** After this lengthy task has been done you could then follow the steps above but once again you run into the problem of computationally intensity.
 
 **Version-Specific Mitigation**
 
@@ -70,3 +70,11 @@ To gain the ability to execute functions like **ExAllocatePoolWithTag**, attacke
 
 
 From what ive seen many individuals in the field seem to have a tunnel vision focus on UM->KM communication, innovating new methods for this purpose. While these techniques can make tracking of execution challenging, there's an overlooked vulnerability inherent to manually mapping a driver. Specifically, the driver and any hook handlers (if one chooses that method of UM->KM communication) now reside in unsigned kernel memory. To the best of my knowledge, this is an anomaly that shouldn't occur under normal circumstances and can be flagged by a kernel level anti-virus very rather easily. What i did notice while not quite as hard to track a simler technique to what this project displays is often employed to call kernel functions. However, it's not fully capitalized upon in the manner it potentially could be. As highlighted in **Understanding Initial Function Execution**, the use of syscalls for kernel function execution is prevalent yet the chosen method for many, specifically **mov RAX, AddressOfFunction; jmp RAX** or any other patching within the .text section of any driver can be easily flagged by kernel-level anti-viruses by simply comparing the .text section loaded in kernel memory to its counterpart on disk. Given that this section only has Read and Execute page protection, it remains immutable, making any deviations a clear red flag.
+
+
+# Credits
+Credits to https://github.com/waryas for his amazing work https://github.com/waryas/UMPMLib/blob/9da1806e3ae3ab9778ce4df886a04ff33ade6c17/MemoryOperationSample/PMemHelper.h#L258
+
+
+
+Credits to the people at vergiliusproject.com for structs and offsets used in this project
