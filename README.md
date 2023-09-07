@@ -42,7 +42,7 @@ While this approach might be computationally intensive, potentially affecting sy
 
 However, the current setup doesn't afford this luxury as far as i know. Without direct references, a more labor-intensive approach becomes necessary:
 1. **Manual Definition:** One would need to manually define which qword corresponds to each function.
-2. **Follow the above steps:** After this legnth task has been done you could then follow the above steps but once again you run into the problem of computationally intensity.
+2. **Follow the above steps:** After this lengthy task has been done you could then follow the steps above but once again you run into the problem of computationally intensity.
 
 **Version-Specific Mitigation**
 
