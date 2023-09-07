@@ -74,4 +74,6 @@ From what ive seen many individuals in the field seem to have a tunnel vision fo
 
 # Credits
 Credits to https://github.com/waryas for his amazing work https://github.com/waryas/UMPMLib/blob/9da1806e3ae3ab9778ce4df886a04ff33ade6c17/MemoryOperationSample/PMemHelper.h#L258
+
+
 Credits to the people at vergiliusproject.com for structs and offsets used in this project
