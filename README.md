@@ -21,7 +21,7 @@ With the call stack represented as:
 ![[image]](https://github.com/JosiahAlm/UserPhys/blob/main/img/CallStack.png)
 
 
-By exploiting this mechanism, one can write to the specified qword, redirecting it to the address of a desired kernel function. This grants the ability to execute any kernel function without the need to modify the .text section of a driver or rely on a handler mapped into the kernel both being trival to detect as stated before, thus streamlining the process and reducing potential points of detection.
+By exploiting this mechanism, one can write to the specified qword, redirecting it to the address of a desired kernel function. This grants the ability to execute any kernel function without the need to modify the .text section of a driver or rely on a handler mapped into the kernel both being trival to detect as stated below, thus streamlining the process and reducing potential points of detection.
 
 **Why This is So Challenging to Mitigate**
 
