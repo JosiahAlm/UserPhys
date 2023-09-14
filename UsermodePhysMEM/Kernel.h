@@ -9,6 +9,8 @@
 inline NtCall PointerOne("NtUserDrawCaptionTemp",0x65E28); // This needs to be specifically a function that gets sys called with the same or more parameters as mmcopymemory 
 inline NtCall PointerTwo("NtUserSetPrecisionTouchPadConfiguration",0x66AD0); // these can be any unused nt function in win32k
 inline NtCall PointerThree("NtUserGetPrecisionTouchPadConfiguration",0x67500); // these can be any unused nt function in win32k
+inline NtCall PointerFour("NtUserInitializeTouchInjection", 0x66248); // these can be any unused nt function in win32k
+inline NtCall PointerFive("NtUserInteractiveControlQueryUsage", 0x66268); // these can be any unused nt function in win32k
 class Kernel {
 public:
     Kernel()
@@ -29,10 +31,15 @@ public:
     bool WritePhysical(__int64 PhysicalAddr, void* Buffer, int size);
 
     template<class T>
-    T Read(__int64 PhysicalAddr);
-
+    T Read(__int64 PhysicalAddr) {
+        T Ret;
+        ReadPhysical(PhysicalAddr, &Ret, sizeof(Ret));
+        return Ret;
+    }
     template<class T>
-    void Write(__int64 PhysicalAddr, T Buffer);
+    void Write(__int64 PhysicalAddr, T Buffer) {
+        WritePhysical(PhysicalAddr, &Buffer, sizeof(Buffer));
+    }
 
     int ProcessId(const char* Name, int Index);
     __int64 EProcess(const char* Name, int Index);
@@ -40,23 +47,26 @@ public:
     __int64 EThread(__int64 DirectoryTable, __int64 EProcess, int TargetThreadId);
     __int64 TranslateLinearAddress(__int64 directoryTableBase, __int64 virtualAddress);
     __int64 GetProcessDirectoryTable(__int64 EProcess);
+    
+    Syscall Exploit;
 
 private:
-    bool bIsDriverLoaded;
     bool bIsExploitInit;
+    bool bIsDriverLoaded;
     __int64 DirTableBase;
     __int64 ExplorerDirectoryTable;
     __int64 ntoskrnlVirtual;
     __int64 ntoskrnlPhysical;
     __int64 win32kVirtual;
 
-    __int64 ExportOffset(__int64 BaseAddress, const char* FunctionName);
+    
     __int64 KernelExport(const char* FunctionName);
+    __int64 ExportOffset(__int64 BaseAddress, const char* FunctionName);
     __int64 BruteKernelDirectoryTable();
     void* GetKernelAddress(const char* Name);
+    void SwapPointer(__int64 Function, __int64 Offset);
     void SwapPointer(const char* FunctionName, __int64 Offset);
 
     Driver Asus;
-    Syscall Exploit;
 };
 

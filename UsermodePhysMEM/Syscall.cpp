@@ -8,6 +8,10 @@ PVOID Syscall::MmMapIoSpaceEx(PHYSICAL_ADDRESS TargetAddress, SIZE_T NumberOfBYt
 void Syscall::MmUnmapIoSpace(PVOID TargetAddress, SIZE_T NumberOfBYtes) {
 	Call<void>(_MmUnmapIoSpace.CallAddress, TargetAddress, NumberOfBYtes);
 }
+void* Syscall::K_memcpy(void* dst, void* src, int size) {
+    return Call<void*>(_memcpy.CallAddress, dst, src, size);
+
+}
 
 bool Syscall::ReadPhysical(__int64 PhysicalAddr, void* Buffer, int size) {
     if (!PhysicalAddr) return false;
